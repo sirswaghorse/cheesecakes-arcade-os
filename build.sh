@@ -9,8 +9,7 @@ lb config \
   --mirror-bootstrap http://deb.debian.org/debian/ \
   --mirror-chroot http://deb.debian.org/debian/ \
   --mirror-binary http://deb.debian.org/debian/ \
-  --mirror-chroot-security http://security.debian.org/debian-security/ \
-  --mirror-binary-security http://security.debian.org/debian-security/ \
+  --security false \
   --distribution bookworm \
   --architectures amd64 \
   --archive-areas "main contrib non-free non-free-firmware" \
@@ -22,3 +21,4 @@ lb config \
 lb build
 mkdir -p out
 mv live-image-amd64.hybrid.iso "out/cheesecake-os-$(date +%Y%m%d)-amd64.iso"
+
