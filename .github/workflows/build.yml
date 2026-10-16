@@ -11,7 +11,7 @@ jobs:
       - name: Install live-build
         run: |
           sudo apt-get update
-          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso curl
+          sudo apt-get install -y live-build debian-archive-keyring debootstrap squashfs-tools xorriso curl
       - name: Build image
         run: sudo bash ./build.sh
       - uses: actions/upload-artifact@v4
