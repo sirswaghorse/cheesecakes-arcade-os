@@ -1,0 +1,15 @@
+#!/bin/sh
+set -e
+id arcade >/dev/null 2>&1 || useradd -m -u 1000 -G audio,video,input,render,bluetooth,netdev -s /usr/sbin/nologin arcade
+echo "cheesecake-os" > /etc/hostname
+plymouth-set-default-theme cheesecake
+update-initramfs -u
+systemctl enable cheesecake-kiosk.service NetworkManager bluetooth
+systemctl set-default graphical.target
+# Appliance lockdown: no login prompts, no tty switching, no magic keys
+systemctl mask getty@tty1.service getty@tty2.service getty@tty3.service getty@tty4.service getty@tty5.service getty@tty6.service autovt@.service
+mkdir -p /etc/systemd/logind.conf.d
+printf '[Login]\nNAutoVTs=0\nReserveVT=0\nHandlePowerKey=poweroff\n' > /etc/systemd/logind.conf.d/cheesecake.conf
+echo "kernel.sysrq=0" > /etc/sysctl.d/90-cheesecake.conf
+# Hide boot text
+sed -i 's/^#\?ShowStatus=.*/ShowStatus=no/' /etc/systemd/system.conf || true

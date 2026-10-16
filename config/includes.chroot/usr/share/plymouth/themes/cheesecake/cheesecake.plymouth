@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Cheesecake
+Description=Cheesecakes Arcade boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/cheesecake
+ScriptFile=/usr/share/plymouth/themes/cheesecake/cheesecake.script

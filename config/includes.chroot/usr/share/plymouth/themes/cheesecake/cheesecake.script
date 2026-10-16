@@ -1,0 +1,14 @@
+Window.SetBackgroundTopColor(0.06, 0.04, 0.12);
+Window.SetBackgroundBottomColor(0.02, 0.01, 0.05);
+img = Image("cheesecake.png");
+s = Math.Min(Window.GetWidth(), Window.GetHeight()) * 0.4 / img.GetWidth();
+img = img.Scale(img.GetWidth() * s, img.GetHeight() * s);
+spr = Sprite(img);
+angle = 0;
+fun refresh() {
+  angle += 0.02;
+  spr.SetImage(img.Rotate(angle));
+  spr.SetX(Window.GetWidth() / 2 - img.GetWidth() / 2);
+  spr.SetY(Window.GetHeight() / 2 - img.GetHeight() / 2);
+}
+Plymouth.SetRefreshFunction(refresh);

@@ -1,0 +1,9 @@
+#!/bin/sh
+# Runs the arcade fullscreen. If it ever closes, systemd starts it again.
+ARCADE_URL="https://cheesecakesarcade.lovable.app/tv"
+exec cage -d -s -- chromium \
+  --kiosk --noerrdialogs --disable-infobars --no-first-run \
+  --enable-features=UseOzonePlatform --ozone-platform=wayland \
+  --autoplay-policy=no-user-gesture-required \
+  --user-data-dir=/home/arcade/.config/cheesecake \
+  "$ARCADE_URL"

@@ -1,0 +1,4 @@
+# Let the arcade user read game controllers (Xbox, PlayStation, Switch Pro).
+KERNEL=="hidraw*", ATTRS{idVendor}=="045e", MODE="0660", GROUP="input"
+KERNEL=="hidraw*", ATTRS{idVendor}=="054c", MODE="0660", GROUP="input"
+KERNEL=="hidraw*", ATTRS{idVendor}=="057e", MODE="0660", GROUP="input"
