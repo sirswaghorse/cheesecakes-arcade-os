@@ -1,7 +1,6 @@
 [Unit]
 Description=Cheesecakes Arcade console session
-After=systemd-user-sessions.service plymouth-quit-wait.service network-online.target
-Wants=network-online.target
+After=systemd-user-sessions.service
 Conflicts=getty@tty1.service
 
 [Service]
@@ -11,10 +10,14 @@ TTYPath=/dev/tty1
 StandardInput=tty
 StandardOutput=journal
 Environment=XDG_RUNTIME_DIR=/run/user/1000
+Environment=XDG_SEAT=seat0
+Environment=XDG_VTNR=1
 ExecStartPre=+/bin/sh -c 'mkdir -p /run/user/1000 && chown arcade:arcade /run/user/1000'
+ExecStartPre=-/usr/bin/plymouth quit --retain-splash
 ExecStart=/usr/local/bin/cheesecake-session
 Restart=always
-RestartSec=1
+RestartSec=2
 
 [Install]
 WantedBy=graphical.target
+
