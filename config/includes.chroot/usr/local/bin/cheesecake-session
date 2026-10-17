@@ -1,9 +1,22 @@
 #!/bin/sh
-# Runs the arcade fullscreen. If it ever closes, systemd starts it again.
+# VM & bare-metal graphics compatibility
+export WLR_NO_HARDWARE_CURSORS=1
+export WLR_RENDERER_ALLOW_SOFTWARE=1
+export XDG_CURRENT_DESKTOP=cage
+export XDG_SESSION_TYPE=wayland
+
 ARCADE_URL="https://cheesecakesarcade.lovable.app/tv"
+
 exec cage -d -s -- chromium \
-  --kiosk --noerrdialogs --disable-infobars --no-first-run \
-  --enable-features=UseOzonePlatform --ozone-platform=wayland \
+  --kiosk \
+  --noerrdialogs \
+  --disable-infobars \
+  --no-first-run \
+  --enable-features=UseOzonePlatform \
+  --ozone-platform=wayland \
+  --disable-dev-shm-usage \
+  --no-sandbox \
+  --ignore-gpu-blocklist \
   --autoplay-policy=no-user-gesture-required \
   --user-data-dir=/home/arcade/.config/cheesecake \
   "$ARCADE_URL"
