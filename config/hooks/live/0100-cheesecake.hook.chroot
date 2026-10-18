@@ -12,6 +12,9 @@ update-initramfs -u
 systemctl enable NetworkManager bluetooth
 systemctl set-default graphical.target
 
+# Ensure session scripts are executable
+chmod +x /usr/local/bin/cheesecake-session 2>/dev/null || true
+
 # Configure automatic login on TTY1 for the arcade user
 mkdir -p /etc/systemd/system/getty@tty1.service.d
 cat <<'EOF' > /etc/systemd/system/getty@tty1.service.d/override.conf
