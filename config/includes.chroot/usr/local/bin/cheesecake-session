@@ -1,9 +1,15 @@
 #!/bin/sh
-# VM & bare-metal graphics compatibility
+set -e
+
+export XDG_RUNTIME_DIR=/run/user/1000
 export WLR_NO_HARDWARE_CURSORS=1
 export WLR_RENDERER_ALLOW_SOFTWARE=1
-export XDG_CURRENT_DESKTOP=cage
 export XDG_SESSION_TYPE=wayland
+export WAYLAND_DISPLAY=wayland-0
+
+mkdir -p /run/user/1000
+chmod 700 /run/user/1000
+mkdir -p /home/arcade/.config/cheesecake
 
 ARCADE_URL="https://cheesecakesarcade.lovable.app/tv"
 
@@ -12,11 +18,14 @@ exec cage -d -s -- chromium \
   --noerrdialogs \
   --disable-infobars \
   --no-first-run \
-  --enable-features=UseOzonePlatform \
+  --no-default-browser-check \
+  --disable-session-crashed-bubble \
   --ozone-platform=wayland \
   --disable-dev-shm-usage \
   --no-sandbox \
+  --test-type \
   --ignore-gpu-blocklist \
+  --in-process-gpu \
   --autoplay-policy=no-user-gesture-required \
   --user-data-dir=/home/arcade/.config/cheesecake \
   "$ARCADE_URL"
