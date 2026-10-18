@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 mkdir -p /home/arcade/.config/cheesecake
 
@@ -12,10 +11,11 @@ exec /usr/bin/chromium \
   --no-first-run \
   --no-default-browser-check \
   --disable-session-crashed-bubble \
-  --enable-features=UseOzonePlatform \
   --ozone-platform=wayland \
-  --test-type \
-  --in-process-gpu \
+  --no-sandbox \
+  --disable-gpu-sandbox \
+  --disable-dev-shm-usage \
+  --ignore-gpu-blocklist \
   --autoplay-policy=no-user-gesture-required \
   --user-data-dir=/home/arcade/.config/cheesecake \
   "$ARCADE_URL"
