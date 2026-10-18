@@ -8,7 +8,9 @@ mesa-vulkan-drivers
 plymouth
 plymouth-themes
 cage
+xwayland
 chromium
+libpam-systemd
 pipewire
 pipewire-pulse
 wireplumber
@@ -16,6 +18,3 @@ network-manager
 bluez
 fonts-dejavu-core
 dbus-user-session
-libpam-systemd
-seatd
-xwayland
