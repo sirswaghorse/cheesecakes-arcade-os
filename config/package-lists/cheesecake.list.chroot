@@ -16,3 +16,6 @@ network-manager
 bluez
 fonts-dejavu-core
 dbus-user-session
+libpam-systemd
+seatd
+xwayland
