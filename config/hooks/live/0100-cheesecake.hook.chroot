@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
-id arcade >/dev/null 2>&1 || useradd -m -u 1000 -G audio,video,input,render,bluetooth,netdev -s /usr/sbin/nologin arcade
+id arcade >/dev/null 2>&1 || useradd -m -u 1000 -G audio,video,input,render,bluetooth,netdev -s /bin/bash arcade
 echo "cheesecake-os" > /etc/hostname
 plymouth-set-default-theme cheesecake
 update-initramfs -u
