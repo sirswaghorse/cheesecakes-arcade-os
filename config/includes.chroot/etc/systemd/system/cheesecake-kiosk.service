@@ -1,7 +1,12 @@
 [Unit]
-Description=Cheesecakes Arcade console session
-After=systemd-user-sessions.service plymouth-quit.service
+Description=Cheesecakes Arcade Console Kiosk
+After=systemd-user-sessions.service plymouth-quit-wait.service
+Before=graphical.target
+ConditionPathExists=/dev/tty0
+Wants=dbus.socket systemd-logind.service
+After=dbus.socket systemd-logind.service
 Conflicts=getty@tty1.service
+After=getty@tty1.service
 
 [Service]
 Type=simple
@@ -9,21 +14,20 @@ User=arcade
 Group=arcade
 PAMName=login
 TTYPath=/dev/tty1
-StandardInput=tty
-StandardOutput=journal+console
-StandardError=journal+console
+TTYReset=yes
+TTYVHangup=yes
+TTYVTDisallocate=yes
+StandardInput=tty-fail
+StandardOutput=journal
+StandardError=journal
 Environment=XDG_RUNTIME_DIR=/run/user/1000
 Environment=WLR_NO_HARDWARE_CURSORS=1
 Environment=WLR_RENDERER_ALLOW_SOFTWARE=1
-Environment=XDG_SESSION_TYPE=wayland
-Environment=SHELL=/bin/bash
-ExecStartPre=+/bin/sh -c 'plymouth --quit || true'
 ExecStartPre=+/bin/sh -c 'mkdir -p /run/user/1000 && chmod 0700 /run/user/1000 && chown arcade:arcade /run/user/1000'
-ExecStart=/usr/local/bin/cheesecake-session
+ExecStart=/usr/bin/cage -d -s -- /usr/local/bin/cheesecake-session
+ExecStartPost=+sh -c "exec chvt 1"
 Restart=always
 RestartSec=2
 
 [Install]
 WantedBy=graphical.target
-
-
