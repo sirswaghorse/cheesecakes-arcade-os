@@ -1,0 +1,74 @@
+#!/bin/bash
+# Cheesecake OS — Target Drive Installer
+# Controller/keyboard-friendly wizard (whiptail TUI) that installs the live
+# system onto an internal drive. Runs on TTY1 when booted with the
+# "Install Cheesecake OS" GRUB entry (kernel param: cheesecake-install).
+set -u
+
+WT="whiptail --title Cheesecake OS Installer --backtitle Cheesecakes Arcade"
+SQUASH=/run/live/medium/live/filesystem.squashfs
+
+die() { $WT --msgbox "$1" 10 60; exit 1; }
+
+# --- Welcome ---
+$WT --yesno "Welcome to the Cheesecake OS installer!\n\nThis will install Cheesecake OS onto an internal drive of this PC.\n\nWARNING: the drive you pick will be completely erased.\n\nContinue?" 12 60 || exit 0
+
+# --- Pick a drive ---
+mapfile -t LINES < <(lsblk -dn -o NAME,SIZE,MODEL -e 7,11 | grep -v '^loop')
+[ ${#LINES[@]} -gt 0 ] || die "No installable drives found."
+MENU=()
+for l in "${LINES[@]}"; do
+  n=$(echo "$l" | awk '{print $1}')
+  rest=$(echo "$l" | cut -d' ' -f2-)
+  MENU+=("/dev/$n" "$rest")
+done
+DISK=$($WT --menu "Choose the drive to install to.\nALL DATA ON IT WILL BE ERASED." 18 70 8 "${MENU[@]}" 3>&1 1>&2 2>&3) || exit 0
+
+# --- Double confirmation ---
+$WT --yesno "You picked:\n\n  $DISK\n\nEverything on this drive will be permanently erased.\n\nAre you sure?" 12 60 || exit 0
+CONFIRM=$($WT --inputbox "Type ERASE (in capitals) to confirm:" 10 60 3>&1 1>&2 2>&3) || exit 0
+[ "$CONFIRM" = "ERASE" ] || die "Confirmation did not match. Nothing was changed."
+
+# --- Partition (GPT: 512M EFI + rest root) ---
+$WT --infobox "Partitioning $DISK ..." 8 50
+wipefs -af "$DISK" || die "Failed to wipe $DISK"
+sgdisk --zap-all "$DISK" >/dev/null 2>&1
+sgdisk -n1:0:+512M -t1:EF00 -c1:EFI -n2:0:0 -t2:8300 -c2:CHEESECAKE "$DISK" || die "Partitioning failed"
+partprobe "$DISK"; sleep 2
+
+# Partition device names (handles nvme0n1p1 vs sda1)
+if [[ "$DISK" == *nvme* || "$DISK" == *mmcblk* ]]; then P="${DISK}p"; else P="$DISK"; fi
+EFI="${P}1"; ROOT="${P}2"
+
+mkfs.vfat -F32 -n EFI "$EFI" || die "Failed to format EFI partition"
+mkfs.ext4 -F -L CHEESECAKE "$ROOT" || die "Failed to format root partition"
+
+# --- Copy the system ---
+$WT --infobox "Installing Cheesecake OS...\nThis can take several minutes." 8 50
+mount "$ROOT" /mnt || die "Failed to mount target"
+mkdir -p /mnt/boot/efi
+mount "$EFI" /mnt/boot/efi || die "Failed to mount EFI partition"
+
+[ -f "$SQUASH" ] || die "Live filesystem not found at $SQUASH"
+unsquashfs -f -d /mnt "$SQUASH" >/dev/null 2>&1 || die "Failed to copy system files"
+
+# --- Bind mounts + fstab + bootloader ---
+for d in dev dev/pts proc sys run; do mount --bind "/$d" "/mnt/$d"; done
+
+ROOT_UUID=$(blkid -s UUID -o value "$ROOT")
+EFI_UUID=$(blkid -s UUID -o value "$EFI")
+cat > /mnt/etc/fstab <<EOF
+UUID=$ROOT_UUID / ext4 errors=remount-ro 0 1
+UUID=$EFI_UUID /boot/efi vfat umask=0077 0 1
+EOF
+
+chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=CheesecakeOS --removable >/dev/null 2>&1
+chroot /mnt grub-install --target=i386-pc "$DISK" >/dev/null 2>&1
+chroot /mnt update-grub >/dev/null 2>&1 || die "Bootloader setup failed"
+
+for d in dev/pts dev proc sys run; do umount "/mnt/$d" 2>/dev/null; done
+umount /mnt/boot/efi; umount /mnt
+
+# --- Done ---
+$WT --yesno "Installation complete!\n\nRemove the USB stick, then choose Yes to reboot into Cheesecake OS." 12 60 && reboot
+exit 0
