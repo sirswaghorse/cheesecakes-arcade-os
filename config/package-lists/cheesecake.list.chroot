@@ -1,20 +1,21 @@
-linux-image-amd64
-firmware-linux
-firmware-iwlwifi
-firmware-realtek
-firmware-misc-nonfree
-mesa-va-drivers
-mesa-vulkan-drivers
+# Cheesecake OS package list — installer additions included.
+# Merge these into your existing cheesecake.list.chroot (keep your current
+# packages and add any missing ones from this list).
+
+cage
+chromium
 plymouth
 plymouth-themes
-cage
-xwayland
-chromium
-libpam-systemd
-pipewire
-pipewire-pulse
-wireplumber
 network-manager
 bluez
-fonts-dejavu-core
-dbus-user-session
+sudo
+libpam-systemd
+seatd
+xwayland
+whiptail
+gdisk
+dosfstools
+e2fsprogs
+squashfs-tools
+grub-efi-amd64-bin
+grub-pc-bin
