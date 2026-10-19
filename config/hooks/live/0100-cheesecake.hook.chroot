@@ -5,6 +5,12 @@ set -e
 id arcade >/dev/null 2>&1 || useradd -m -u 1000 -G audio,video,input,render,bluetooth,netdev,tty -s /bin/bash arcade
 passwd -d arcade >/dev/null 2>&1 || true
 
+# Let arcade run the installer (and reboot) without a password
+cat <<'EOF' > /etc/sudoers.d/cheesecake-installer
+arcade ALL=(root) NOPASSWD: /usr/local/bin/cheesecake-installer, /sbin/reboot
+EOF
+chmod 440 /etc/sudoers.d/cheesecake-installer
+
 echo "cheesecake-os" > /etc/hostname
 plymouth-set-default-theme cheesecake
 update-initramfs -u
@@ -14,6 +20,7 @@ systemctl set-default graphical.target
 
 # Ensure session scripts are executable
 chmod +x /usr/local/bin/cheesecake-session 2>/dev/null || true
+chmod +x /usr/local/bin/cheesecake-installer 2>/dev/null || true
 
 # Configure automatic login on TTY1 for the arcade user
 mkdir -p /etc/systemd/system/getty@tty1.service.d
