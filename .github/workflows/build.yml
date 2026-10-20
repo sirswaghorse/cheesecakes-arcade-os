@@ -21,6 +21,7 @@ jobs:
         with:
           name: cheesecake-os-iso
           path: out/*.iso
+          retention-days: 1
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
